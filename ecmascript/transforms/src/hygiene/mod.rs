@@ -108,7 +108,10 @@ impl<'a> Hygiene<'a> {
             ctxt
         );
         old.retain(|c| *c != ctxt);
-        debug_assert!(old.len() == 0 || old.len() == 1);
+        if old.len() > 1 {
+            println!("ASSERT failed in rename: {}{:?} -> {}", sym, ctxt, renamed);
+            println!("old.len: {}", old.len());
+        }
 
         let new = declared_symbols.entry(renamed.clone()).or_default();
         new.push(ctxt);
