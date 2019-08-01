@@ -97,6 +97,26 @@ impl<'a, I: Input> Parser<'a, I> {
         })
     }
 
+    pub fn parse_eslib(&mut self) -> PResult<'a, Module> {
+        //TODO: parse() -> PResult<'a, Program>
+        let ctx = Context {
+            module: true,
+            strict: false,
+            ..self.ctx()
+        };
+        // Module code is always in strict mode
+        self.set_ctx(ctx);
+
+        let start = cur_pos!();
+        let shebang = self.parse_shebang()?;
+
+        self.parse_block_body(true, true, None).map(|body| Module {
+            span: span!(start),
+            body,
+            shebang,
+        })
+    }
+
     fn parse_shebang(&mut self) -> PResult<'a, Option<JsWord>> {
         match cur!(false) {
             Ok(&Token::Shebang(..)) => match bump!() {
